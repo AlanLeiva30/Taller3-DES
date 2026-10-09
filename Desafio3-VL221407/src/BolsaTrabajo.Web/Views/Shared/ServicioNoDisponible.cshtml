@@ -1,0 +1,11 @@
+@{
+    ViewData["Title"] = "Servicio no disponible";
+}
+<div class="@(User.Identity?.IsAuthenticated == true ? "" : "container")">
+    <div class="pagina-mensaje">
+        <div class="vacio-icono color-ambar"><i class="bi bi-cloud-slash"></i></div>
+        <h2 class="fw-bold">El servicio no está disponible en este momento</h2>
+        <p class="text-secondary">No pudimos obtener la información solicitada. Espere unos minutos e intente de nuevo.</p>
+        <a class="btn btn-primary mt-3" href="@(Context.Request.Path + Context.Request.QueryString)"><i class="bi bi-arrow-clockwise"></i>Intentar de nuevo</a>
+    </div>
+</div>

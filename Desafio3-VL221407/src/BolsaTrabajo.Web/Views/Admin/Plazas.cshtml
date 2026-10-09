@@ -1,0 +1,23 @@
+@model ListadoPlazasViewModel
+@{
+    ViewData["Title"] = "Plazas";
+    ViewData["Subtitulo"] = "Todas las plazas del sistema, de todos los agentes.";
+    ViewData["Area"] = "Admin";
+}
+
+<div class="mb-4"><partial name="_FiltrosPlazas" model="Model" /></div>
+
+<div class="card">
+    @if (Model.Todas.Count == 0)
+    {
+        <partial name="_EstadoVacio" model='new EstadoVacioViewModel("bi-briefcase", "No hay plazas registradas", "Las plazas que creen los agentes de selección aparecerán aquí.")' />
+    }
+    else if (Model.Plazas.Count == 0)
+    {
+        <partial name="_EstadoVacio" model='new EstadoVacioViewModel("bi-funnel", "No hay plazas con este estado", "Seleccione otro filtro para ver el resto.")' />
+    }
+    else
+    {
+        <partial name="_TablaPlazas" model="Model.Plazas" view-data="ViewData" />
+    }
+</div>

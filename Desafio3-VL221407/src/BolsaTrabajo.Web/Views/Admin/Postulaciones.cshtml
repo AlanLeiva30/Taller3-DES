@@ -1,0 +1,24 @@
+@model ListadoPostulacionesViewModel
+@{
+    ViewData["Title"] = "Postulaciones";
+    ViewData["Subtitulo"] = "Todas las postulaciones de todos los procesos de selección.";
+}
+
+<partial name="_SelectorPlaza" model="Model" />
+
+<div class="mb-4"><partial name="_FiltrosPostulaciones" model="Model" /></div>
+
+<div class="card">
+    @if (Model.Todas.Count == 0)
+    {
+        <partial name="_EstadoVacio" model='new EstadoVacioViewModel("bi-inbox", "No hay postulaciones", "Las postulaciones de los candidatos aparecerán aquí.")' />
+    }
+    else if (Model.Postulaciones.Count == 0)
+    {
+        <partial name="_EstadoVacio" model='new EstadoVacioViewModel("bi-funnel", "No hay postulaciones con este estado", "Seleccione otro filtro para ver el resto.")' />
+    }
+    else
+    {
+        <partial name="_TablaPostulaciones" model="Model.Postulaciones" />
+    }
+</div>

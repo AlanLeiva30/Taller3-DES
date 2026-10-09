@@ -1,0 +1,70 @@
+﻿@model RegistroCandidatoDto
+@{
+    ViewData["Title"] = "Crear cuenta";
+}
+<div class="container">
+    <div class="auth-contenedor">
+        <div class="card auth-tarjeta">
+            <div class="row g-0">
+                <div class="col-lg-5 d-none d-lg-block">
+                    <div class="auth-lado">
+                        <span class="marca-icono mb-4"><i class="bi bi-person-plus-fill"></i></span>
+                        <h2 class="fw-bold mb-3">Cree su cuenta de candidato</h2>
+                        <p class="mb-4" style="color:#b5d0d1">Es gratuito y le permitirá postularse a las plazas publicadas.</p>
+                        <ul class="list-unstyled mb-0">
+                            <li><i class="bi bi-check2-circle"></i>Acceso a todas las plazas abiertas</li>
+                            <li><i class="bi bi-check2-circle"></i>Postulación en línea</li>
+                            <li><i class="bi bi-check2-circle"></i>Seguimiento del resultado de cada proceso</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="auth-formulario">
+                        <h1 class="h3 fw-bold mb-1">Crear cuenta</h1>
+                        <p class="text-secondary mb-4">Complete sus datos para registrarse como candidato.</p>
+
+                        <form asp-action="Registro" method="post" novalidate>
+                            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                            <div class="mb-3">
+                                <label asp-for="NombreCompleto" class="form-label"></label>
+                                <input asp-for="NombreCompleto" class="form-control" placeholder="Nombres y apellidos" autocomplete="name" autofocus />
+                                <span asp-validation-for="NombreCompleto"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Email" class="form-label"></label>
+                                <input asp-for="Email" class="form-control" placeholder="nombre@correo.com" autocomplete="email" />
+                                <span asp-validation-for="Email"></span>
+                            </div>
+
+                            <div class="row g-3 mb-1">
+                                <div class="col-md-6">
+                                    <label asp-for="Password" class="form-label"></label>
+                                    <input asp-for="Password" class="form-control" autocomplete="new-password" />
+                                    <span asp-validation-for="Password"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="ConfirmarPassword" class="form-label"></label>
+                                    <input asp-for="ConfirmarPassword" class="form-control" autocomplete="new-password" />
+                                    <span asp-validation-for="ConfirmarPassword"></span>
+                                </div>
+                            </div>
+                            <div class="form-text mb-4"><i class="bi bi-info-circle me-1"></i>Mínimo 8 caracteres, con al menos una mayúscula, una minúscula y un número.</div>
+
+                            <button type="submit" class="btn btn-primary w-100 py-2"><i class="bi bi-person-check"></i>Crear mi cuenta</button>
+                        </form>
+
+                        <p class="text-center text-secondary mt-4 mb-0">
+                            ¿Ya tiene una cuenta? <a asp-action="Login" class="fw-semibold">Inicie sesión</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,18 @@
+@model PlazaDto
+<div class="card tarjeta-plaza h-100">
+    <div class="card-body d-flex flex-column">
+        <div class="d-flex justify-content-between align-items-center gap-2">
+            <span class="icono-institucion" aria-hidden="true">SV</span>
+            <span class="estado @Presentacion.ClaseEstadoPlaza(Model)">@Presentacion.TextoEstadoPlaza(Model)</span>
+        </div>
+        <span class="institucion">@Model.Institucion</span>
+        <h3 class="h5 mb-2">
+            <a class="enlace-plaza stretched-link" asp-controller="Plazas" asp-action="Detalle" asp-route-id="@Model.IdPlaza">@Model.Titulo</a>
+        </h3>
+        <p class="resumen flex-grow-1 mb-3">@Presentacion.Resumen(Model.Descripcion, 130)</p>
+        <div class="d-flex justify-content-between align-items-center small pt-3 border-top">
+            <span class="text-secondary">Cierre: @Presentacion.FechaCorta(Model.FechaCierre)</span>
+            <span class="fw-semibold @Presentacion.ClaseTiempoRestante(Model.FechaCierre)">@Presentacion.TiempoRestante(Model.FechaCierre)</span>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,85 @@
+@model CandidatoPanelViewModel
+@{
+    ViewData["Title"] = "Mi panel";
+    ViewData["Subtitulo"] = "Resumen de sus postulaciones y de su perfil.";
+    var hoja = Model.HojaDeVida;
+    var nombre = User.NombreUsuario().Split(' ')[0];
+}
+
+<div class="bienvenida mb-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
+    <div>
+        <h2>Hola, @nombre</h2>
+        <p>Aquí puede ver cómo van sus procesos de selección.</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-light" asp-controller="Plazas" asp-action="Index"><i class="bi bi-search"></i>Buscar plazas</a>
+        <a class="btn btn-outline-light" asp-action="MiPerfil"><i class="bi bi-person-circle"></i>Mi perfil</a>
+    </div>
+</div>
+
+<div class="row row-cols-2 row-cols-xl-4 g-3 mb-4">
+    <div class="col"><partial name="_Indicador" model='new IndicadorViewModel("bi-send", Model.Total.ToString(), "Postulaciones enviadas", "azul")' /></div>
+    <div class="col"><partial name="_Indicador" model='new IndicadorViewModel("bi-hourglass-split", Model.EnRevision.ToString(), "En revisión", "ambar")' /></div>
+    <div class="col"><partial name="_Indicador" model='new IndicadorViewModel("bi-check-circle", Model.Aprobadas.ToString(), "Aprobadas", "verde")' /></div>
+    <div class="col"><partial name="_Indicador" model='new IndicadorViewModel("bi-x-circle", Model.Rechazadas.ToString(), "Rechazadas", "rojo")' /></div>
+</div>
+
+<div class="row g-4">
+    <div class="col-xl-8">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2>Postulaciones recientes</h2>
+                @if (Model.Total > 0)
+                {
+                    <a asp-action="MisPostulaciones" class="small fw-semibold">Ver todas</a>
+                }
+            </div>
+            @if (Model.Total == 0)
+            {
+                <partial name="_EstadoVacio" model='new EstadoVacioViewModel("bi-send", "Aún no se ha postulado", "Explore las plazas abiertas y postúlese a las que le interesen.", "Ver plazas disponibles", Url.Action("Index", "Plazas"))' />
+            }
+            else
+            {
+                ViewData["MostrarCandidato"] = false;
+                <partial name="_TablaPostulaciones" model="Model.Postulaciones.Take(5).ToList()" view-data="ViewData" />
+            }
+        </div>
+    </div>
+
+    <div class="col-xl-4">
+        <div class="card h-100">
+            <div class="card-header"><h2>Mi hoja de vida</h2></div>
+            <div class="card-body">
+                @if (hoja is null)
+                {
+                    <div class="alert alert-warning mb-3"><i class="bi bi-exclamation-triangle-fill"></i><div>Todavía no ha registrado su hoja de vida.</div></div>
+                    <p class="text-secondary small mb-3">Una hoja de vida completa ayuda a los agentes de selección a conocer su formación y experiencia.</p>
+                }
+                else
+                {
+                    <ul class="list-unstyled lista-verificacion mb-3">
+                        <li><i class="bi @(string.IsNullOrWhiteSpace(hoja.FormacionAcademica) ? "bi-circle" : "bi-check-circle-fill")"></i>Formación académica</li>
+                        <li><i class="bi @(string.IsNullOrWhiteSpace(hoja.ExperienciaLaboral) ? "bi-circle" : "bi-check-circle-fill")"></i>Experiencia laboral</li>
+                        <li><i class="bi @(string.IsNullOrWhiteSpace(hoja.Competencias) ? "bi-circle" : "bi-check-circle-fill")"></i>Competencias</li>
+                        <li><i class="bi @(hoja.TieneArchivoCV ? "bi-check-circle-fill" : "bi-circle")"></i>CV en PDF</li>
+                    </ul>
+                }
+                <a class="btn btn-outline-primary w-100" asp-action="MiPerfil"><i class="bi bi-person-circle"></i>Ir a mi perfil</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model.PlazasSugeridas.Count > 0)
+{
+    <div class="d-flex justify-content-between align-items-center mt-5 mb-3">
+        <h2 class="h5 fw-bold mb-0">Plazas que podrían interesarle</h2>
+        <a asp-controller="Plazas" asp-action="Index" class="small fw-semibold">Ver todas</a>
+    </div>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+        @foreach (var plaza in Model.PlazasSugeridas)
+        {
+            <div class="col"><partial name="_TarjetaPlaza" model="plaza" /></div>
+        }
+    </div>
+}

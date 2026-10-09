@@ -1,0 +1,26 @@
+@model ListadoPlazasViewModel
+@{
+    ViewData["Title"] = "Mis plazas";
+    ViewData["Subtitulo"] = "Plazas que usted creó y su estado actual.";
+    ViewData["Area"] = "Agente";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <partial name="_FiltrosPlazas" model="Model" />
+    <a class="btn btn-primary" asp-action="CrearPlaza"><i class="bi bi-plus-circle"></i>Crear plaza</a>
+</div>
+
+<div class="card">
+    @if (Model.Todas.Count == 0)
+    {
+        <partial name="_EstadoVacio" model='new EstadoVacioViewModel("bi-briefcase", "Todavía no ha creado plazas", "Cree su primera plaza para empezar a recibir postulaciones.", "Crear plaza", Url.Action("CrearPlaza"))' />
+    }
+    else if (Model.Plazas.Count == 0)
+    {
+        <partial name="_EstadoVacio" model='new EstadoVacioViewModel("bi-funnel", "No hay plazas con este estado", "Seleccione otro filtro para ver el resto de sus plazas.")' />
+    }
+    else
+    {
+        <partial name="_TablaPlazas" model="Model.Plazas" view-data="ViewData" />
+    }
+</div>

@@ -1,0 +1,14 @@
+@model IndicadorViewModel
+<div class="card h-100">
+    <div class="indicador">
+        <div class="indicador-icono color-@Model.Color"><i class="bi @Model.Icono"></i></div>
+        <div style="min-width:0">
+            <div class="indicador-valor">@Model.Valor</div>
+            <div class="indicador-etiqueta">@Model.Etiqueta</div>
+            @if (Model.Detalle is not null)
+            {
+                <div class="indicador-detalle">@Model.Detalle</div>
+            }
+        </div>
+    </div>
+</div>

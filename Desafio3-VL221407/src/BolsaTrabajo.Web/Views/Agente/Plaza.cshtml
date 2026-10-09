@@ -1,0 +1,92 @@
+@model GestionPlazaViewModel
+@{
+    var p = Model.Plaza;
+    ViewData["Title"] = "Gestionar plaza";
+    ViewData["Subtitulo"] = p.Titulo;
+    ViewData["Evaluar"] = true;
+    ViewData["MostrarPlaza"] = false;
+    ViewData["VolverA"] = Url.Action("Plaza", new { id = p.IdPlaza });
+    var estadosDisponibles = Enum.GetValues<EstadoPlaza>().Where(e => e != p.Estado).ToList();
+}
+
+<nav aria-label="Ruta de navegación" class="mb-3">
+    <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a asp-action="Plazas">Mis plazas</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@p.Titulo</li>
+    </ol>
+</nav>
+
+<div class="row g-4 mb-4">
+    <div class="col-xl-8">
+        <div class="card h-100">
+            <div class="card-body p-4">
+                <div class="d-flex flex-wrap justify-content-between gap-2 mb-2">
+                    <span class="text-secondary fw-semibold"><i class="bi bi-building me-1"></i>@p.Institucion</span>
+                    <span class="estado @Presentacion.ClaseEstadoPlaza(p)">@Presentacion.TextoEstadoPlaza(p)</span>
+                </div>
+                <h2 class="fw-bold mb-3">@p.Titulo</h2>
+                <div class="d-flex flex-wrap gap-4 small text-secondary mb-3">
+                    <span><i class="bi bi-calendar-check me-1"></i>Publicación: <strong class="text-body">@Presentacion.FechaCorta(p.FechaPublicacion)</strong></span>
+                    <span><i class="bi bi-calendar-x me-1"></i>Cierre: <strong class="text-body">@Presentacion.FechaCorta(p.FechaCierre)</strong></span>
+                    <span><i class="bi bi-people me-1"></i>Postulaciones: <strong class="text-body">@Model.Postulaciones.Count</strong></span>
+                </div>
+                <div class="texto-largo text-secondary">@Presentacion.Resumen(p.Descripcion, 600)</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4">
+        <div class="card h-100">
+            <div class="card-header"><h2>Acciones</h2></div>
+            <div class="card-body d-grid gap-2">
+                @if (!p.Publicada)
+                {
+                    <div class="alert alert-info small mb-1"><i class="bi bi-eye-slash"></i><div>Esta plaza es un borrador: los candidatos todavía no la ven.</div></div>
+                    <form asp-action="Publicar" asp-route-id="@p.IdPlaza" method="post"
+                          data-confirmar="¿Desea publicar «@p.Titulo»? Los candidatos podrán verla y postularse." data-confirmar-boton="Sí, publicar">
+                        <button type="submit" class="btn btn-success w-100"><i class="bi bi-megaphone"></i>Publicar plaza</button>
+                    </form>
+                }
+
+                <a class="btn btn-outline-primary" asp-action="EditarPlaza" asp-route-id="@p.IdPlaza"><i class="bi bi-pencil-square"></i>Editar información</a>
+
+                <form asp-action="CambiarEstado" asp-route-id="@p.IdPlaza" method="post" class="border rounded-3 p-2"
+                      data-confirmar="¿Desea cambiar el estado de esta plaza?" data-confirmar-boton="Sí, cambiar">
+                    <label for="estado" class="form-label small mb-1">Cambiar estado del proceso</label>
+                    <div class="input-group">
+                        <select id="estado" name="estado" class="form-select">
+                            @foreach (var e in estadosDisponibles)
+                            {
+                                <option value="@e">@Presentacion.Texto(e)</option>
+                            }
+                        </select>
+                        <button type="submit" class="btn btn-primary">Aplicar</button>
+                    </div>
+                </form>
+
+                <form asp-action="EliminarPlaza" asp-route-id="@p.IdPlaza" method="post"
+                      data-confirmar="¿Desea eliminar definitivamente «@p.Titulo»? Esta acción no se puede deshacer."
+                      data-confirmar-boton="Sí, eliminar" data-confirmar-estilo="danger">
+                    <button type="submit" class="btn btn-outline-danger w-100"><i class="bi bi-trash"></i>Eliminar plaza</button>
+                </form>
+
+                <a class="btn btn-link" asp-controller="Plazas" asp-action="Detalle" asp-route-id="@p.IdPlaza"><i class="bi bi-eye"></i>Ver como la ven los candidatos</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h2>Candidatos postulados</h2>
+        <span class="small text-secondary">@Model.Postulaciones.Count(x => x.Estado == EstadoPostulacion.EnRevision) pendiente(s) de evaluar</span>
+    </div>
+    @if (Model.Postulaciones.Count == 0)
+    {
+        <partial name="_EstadoVacio" model='new EstadoVacioViewModel("bi-inbox", "Aún no hay postulaciones", p.Publicada ? "Cuando los candidatos se postulen, aparecerán aquí para que pueda evaluarlos." : "Publique la plaza para empezar a recibir postulaciones.")' />
+    }
+    else
+    {
+        <partial name="_TablaPostulaciones" model="Model.Postulaciones" view-data="ViewData" />
+    }
+</div>

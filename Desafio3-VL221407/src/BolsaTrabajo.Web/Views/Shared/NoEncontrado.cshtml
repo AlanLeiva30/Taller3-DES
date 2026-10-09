@@ -1,0 +1,14 @@
+@{
+    ViewData["Title"] = "No encontrado";
+}
+<div class="@(User.Identity?.IsAuthenticated == true ? "" : "container")">
+    <div class="pagina-mensaje">
+        <div class="vacio-icono"><i class="bi bi-search"></i></div>
+        <h2 class="fw-bold">No encontramos lo que busca</h2>
+        <p class="text-secondary">@(ViewData["Mensaje"] ?? "La información solicitada no existe o ya no está disponible.")</p>
+        <div class="d-flex justify-content-center gap-2 mt-4">
+            <a class="btn btn-outline-primary" asp-controller="Plazas" asp-action="Index"><i class="bi bi-briefcase"></i>Ver plazas disponibles</a>
+            <a class="btn btn-primary" asp-controller="Home" asp-action="Index"><i class="bi bi-house"></i>Ir al inicio</a>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,18 @@
+@{
+    ViewData["Title"] = "Acceso restringido";
+}
+<div class="@(User.Identity?.IsAuthenticated == true ? "" : "container")">
+    <div class="pagina-mensaje">
+        <div class="vacio-icono color-rojo"><i class="bi bi-shield-lock"></i></div>
+        <h2 class="fw-bold">No tiene permiso para ver esta página</h2>
+        <p class="text-secondary">Esta sección corresponde a otro tipo de usuario. Si cree que se trata de un error, comuníquese con el administrador.</p>
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <a class="btn btn-primary mt-3" asp-controller="Panel" asp-action="Index"><i class="bi bi-grid-1x2"></i>Volver a mi panel</a>
+        }
+        else
+        {
+            <a class="btn btn-primary mt-3" asp-controller="Cuenta" asp-action="Login"><i class="bi bi-box-arrow-in-right"></i>Iniciar sesión</a>
+        }
+    </div>
+</div>

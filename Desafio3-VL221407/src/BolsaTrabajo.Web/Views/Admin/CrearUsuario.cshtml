@@ -1,0 +1,60 @@
+@model CrearUsuarioDto
+@{
+    ViewData["Title"] = "Crear usuario";
+    ViewData["Subtitulo"] = "Registre una cuenta nueva, por ejemplo para un Agente de Selección.";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-6">
+        <nav aria-label="Ruta de navegación" class="mb-3">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a asp-action="Usuarios">Usuarios</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Crear usuario</li>
+            </ol>
+        </nav>
+
+        <div class="card">
+            <div class="card-body p-4">
+                <form asp-action="CrearUsuario" method="post" novalidate>
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="NombreCompleto" class="form-label"></label>
+                        <input asp-for="NombreCompleto" class="form-control" placeholder="Nombres y apellidos" autofocus />
+                        <span asp-validation-for="NombreCompleto"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" class="form-control" placeholder="nombre@institucion.gob" />
+                        <span asp-validation-for="Email"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Password" class="form-label">Contraseña inicial</label>
+                        <input asp-for="Password" class="form-control" autocomplete="new-password" />
+                        <span asp-validation-for="Password"></span>
+                        <div class="form-text">Mínimo 8 caracteres, con al menos una mayúscula, una minúscula y un número.</div>
+                    </div>
+                    <div class="mb-4">
+                        <label asp-for="Rol" class="form-label"></label>
+                        <select asp-for="Rol" class="form-select">
+                            @foreach (var rol in Roles.Todos)
+                            {
+                                <option value="@rol">@rol</option>
+                            }
+                        </select>
+                        <span asp-validation-for="Rol"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a class="btn btn-light" asp-action="Usuarios">Cancelar</a>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-person-check"></i>Crear usuario</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,75 @@
+@model PlazasPublicasViewModel
+@{
+    ViewData["Title"] = "Plazas disponibles";
+    ViewData["Subtitulo"] = "Plazas publicadas que están recibiendo postulaciones.";
+    var enPanel = User.Identity?.IsAuthenticated == true;
+}
+
+<partial name="_EncabezadoPublico" />
+
+<div class="@(enPanel ? "" : "container py-4")">
+    <form method="get" asp-action="Index" class="buscador mb-4">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-6">
+                <label for="buscar" class="form-label">Buscar</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="bi bi-search text-secondary"></i></span>
+                    <input id="buscar" name="buscar" value="@Model.Buscar" class="form-control" placeholder="Puesto, palabra clave o institución" />
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label for="institucion" class="form-label">Institución</label>
+                <select id="institucion" name="institucion" class="form-select">
+                    <option value="">Todas las instituciones</option>
+                    @foreach (var institucion in Model.Instituciones)
+                    {
+                        <option value="@institucion" selected="@(string.Equals(institucion, Model.Institucion, StringComparison.OrdinalIgnoreCase))">@institucion</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2 d-grid">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-funnel"></i>Buscar</button>
+            </div>
+        </div>
+    </form>
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <p class="text-secondary mb-0">
+            @if (Model.HayFiltros)
+            {
+                <span><strong>@Model.Plazas.Count</strong> de @Model.TotalSinFiltro plazas coinciden con su búsqueda.</span>
+            }
+            else
+            {
+                <span><strong>@Model.Plazas.Count</strong> @(Model.Plazas.Count == 1 ? "plaza disponible" : "plazas disponibles").</span>
+            }
+        </p>
+        @if (Model.HayFiltros)
+        {
+            <a asp-action="Index" class="btn btn-sm btn-link"><i class="bi bi-x-circle"></i>Quitar filtros</a>
+        }
+    </div>
+
+    @if (Model.Plazas.Count == 0)
+    {
+        <div class="card">
+            @if (Model.HayFiltros)
+            {
+                <partial name="_EstadoVacio" model='new EstadoVacioViewModel("bi-search", "No encontramos plazas con esos criterios", "Pruebe con otras palabras o quite el filtro de institución.", "Ver todas las plazas", Url.Action("Index"))' />
+            }
+            else
+            {
+                <partial name="_EstadoVacio" model='new EstadoVacioViewModel("bi-briefcase", "No hay plazas abiertas por ahora", "Vuelva pronto: las instituciones publican nuevas plazas con frecuencia.")' />
+            }
+        </div>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+            @foreach (var plaza in Model.Plazas)
+            {
+                <div class="col"><partial name="_TarjetaPlaza" model="plaza" /></div>
+            }
+        </div>
+    }
+</div>

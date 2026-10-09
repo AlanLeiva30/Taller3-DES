@@ -1,0 +1,10 @@
+@model EstadoVacioViewModel
+<div class="vacio">
+    <div class="vacio-icono"><i class="bi @Model.Icono"></i></div>
+    <h3>@Model.Titulo</h3>
+    <p>@Model.Mensaje</p>
+    @if (Model.TextoAccion is not null && Model.UrlAccion is not null)
+    {
+        <a class="btn btn-primary mt-3" href="@Model.UrlAccion">@Model.TextoAccion</a>
+    }
+</div>

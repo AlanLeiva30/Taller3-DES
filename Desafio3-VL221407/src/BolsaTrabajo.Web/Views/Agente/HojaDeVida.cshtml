@@ -1,0 +1,65 @@
+@model HojaDeCandidatoViewModel
+@{
+    ViewData["Title"] = "Hoja de vida";
+    ViewData["Subtitulo"] = Model.NombreCandidato;
+    var hoja = Model.HojaDeVida;
+    var partes = Model.NombreCandidato.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+    var iniciales = partes.Length >= 2 ? $"{partes[0][0]}{partes[1][0]}" : partes.Length == 1 ? partes[0][..1] : "?";
+}
+
+<nav aria-label="Ruta de navegación" class="mb-3">
+    <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a asp-action="Postulaciones">Postulaciones recibidas</a></li>
+        @if (Model.IdPlaza is not null)
+        {
+            <li class="breadcrumb-item"><a asp-action="Plaza" asp-route-id="@Model.IdPlaza">@Model.TituloPlaza</a></li>
+        }
+        <li class="breadcrumb-item active" aria-current="page">@Model.NombreCandidato</li>
+    </ol>
+</nav>
+
+<div class="row g-4">
+    <div class="col-xl-4">
+        <div class="card">
+            <div class="card-body text-center p-4">
+                <span class="avatar avatar-lg mb-3">@iniciales.ToUpperInvariant()</span>
+                <h2 class="h5 fw-bold mb-1">@Model.NombreCandidato</h2>
+                <div class="text-secondary small mb-3">@Model.EmailCandidato</div>
+                @if (hoja?.TieneArchivoCV == true)
+                {
+                    <a class="btn btn-primary w-100" asp-action="DescargarCv" asp-route-id="@Model.IdCandidato">
+                        <i class="bi bi-file-earmark-pdf"></i>Descargar CV
+                    </a>
+                    <div class="small text-secondary mt-2 text-break">@hoja.NombreArchivoCV</div>
+                }
+                else
+                {
+                    <div class="alert alert-warning small mb-0"><i class="bi bi-file-earmark-x"></i><div>El candidato no ha subido su CV en PDF.</div></div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-8">
+        <div class="card h-100">
+            <div class="card-header"><h2>Información profesional</h2></div>
+            <div class="card-body">
+                @if (hoja is null)
+                {
+                    <partial name="_EstadoVacio" model='new EstadoVacioViewModel("bi-file-earmark-person", "Sin hoja de vida", "El candidato todavía no ha registrado su formación, experiencia ni competencias.")' />
+                }
+                else
+                {
+                    <dl class="lista-datos mb-0">
+                        <dt>Formación académica</dt>
+                        <dd class="texto-largo">@hoja.FormacionAcademica</dd>
+                        <dt>Experiencia laboral</dt>
+                        <dd class="texto-largo">@(string.IsNullOrWhiteSpace(hoja.ExperienciaLaboral) ? "Sin registrar" : hoja.ExperienciaLaboral)</dd>
+                        <dt>Competencias</dt>
+                        <dd class="texto-largo mb-0">@(string.IsNullOrWhiteSpace(hoja.Competencias) ? "Sin registrar" : hoja.Competencias)</dd>
+                    </dl>
+                }
+            </div>
+        </div>
+    </div>
+</div>

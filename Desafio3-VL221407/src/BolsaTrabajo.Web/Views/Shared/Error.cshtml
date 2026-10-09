@@ -1,0 +1,16 @@
+@model ErrorViewModel
+@{
+    ViewData["Title"] = "Algo salió mal";
+}
+<div class="@(User.Identity?.IsAuthenticated == true ? "" : "container")">
+    <div class="pagina-mensaje">
+        <div class="vacio-icono color-rojo"><i class="bi bi-exclamation-triangle"></i></div>
+        <h2 class="fw-bold">Ocurrió un problema inesperado</h2>
+        <p class="text-secondary">Intente de nuevo en unos momentos. Si el problema continúa, comuníquese con el administrador del sistema.</p>
+        @if (Model?.ShowRequestId == true)
+        {
+            <p class="small text-secondary">Código de referencia: <code>@Model.RequestId</code></p>
+        }
+        <a class="btn btn-primary mt-3" asp-controller="Home" asp-action="Index"><i class="bi bi-house"></i>Ir al inicio</a>
+    </div>
+</div>

@@ -1,0 +1,69 @@
+﻿@{
+    var controlador = ViewContext.RouteData.Values["controller"]?.ToString();
+    var accion = ViewContext.RouteData.Values["action"]?.ToString();
+
+    string Activo(string c, string? a = null) =>
+        string.Equals(controlador, c, StringComparison.OrdinalIgnoreCase)
+        && (a is null || string.Equals(accion, a, StringComparison.OrdinalIgnoreCase)) ? "active" : "";
+}
+<div class="barra-lateral-interior">
+    <div class="d-flex align-items-center justify-content-between px-3 pt-3 pb-2">
+        <a class="marca" asp-controller="Panel" asp-action="Index">
+            <span class="marca-icono">SV</span>
+            <span class="marca-texto">Bolsa de Trabajo<small>Servidores Públicos</small></span>
+        </a>
+        <button type="button" class="btn-close btn-close-white d-lg-none" data-bs-dismiss="offcanvas" data-bs-target="#menuLateral" aria-label="Cerrar menú"></button>
+    </div>
+
+    <nav class="menu-lateral flex-grow-1 px-2 pb-3">
+        @if (User.EsCandidato())
+        {
+            <div class="menu-seccion">Principal</div>
+            <a class="nav-link @Activo("Candidato", "Index")" asp-controller="Candidato" asp-action="Index"><i class="bi bi-grid-1x2"></i>Mi panel</a>
+
+            <div class="menu-seccion">Empleo</div>
+            <a class="nav-link @Activo("Plazas")" asp-controller="Plazas" asp-action="Index"><i class="bi bi-search"></i>Plazas disponibles</a>
+            <a class="nav-link @Activo("Candidato", "MisPostulaciones")" asp-controller="Candidato" asp-action="MisPostulaciones"><i class="bi bi-send-check"></i>Mis postulaciones</a>
+
+            <div class="menu-seccion">Mi cuenta</div>
+            <a class="nav-link @Activo("Candidato", "MiPerfil")" asp-controller="Candidato" asp-action="MiPerfil"><i class="bi bi-person-circle"></i>Mi perfil</a>
+        }
+        else if (User.EsAgente())
+        {
+            <div class="menu-seccion">Principal</div>
+            <a class="nav-link @Activo("Agente", "Index")" asp-controller="Agente" asp-action="Index"><i class="bi bi-grid-1x2"></i>Mi panel</a>
+
+            <div class="menu-seccion">Gestión</div>
+            <a class="nav-link @Activo("Agente", "Plazas")" asp-controller="Agente" asp-action="Plazas"><i class="bi bi-briefcase"></i>Mis plazas</a>
+            <a class="nav-link @Activo("Agente", "CrearPlaza")" asp-controller="Agente" asp-action="CrearPlaza"><i class="bi bi-plus-circle"></i>Crear plaza</a>
+            <a class="nav-link @Activo("Agente", "Postulaciones")" asp-controller="Agente" asp-action="Postulaciones"><i class="bi bi-people"></i>Postulaciones recibidas</a>
+
+            <div class="menu-seccion">Consulta</div>
+            <a class="nav-link @Activo("Plazas")" asp-controller="Plazas" asp-action="Index"><i class="bi bi-globe2"></i>Plazas publicadas</a>
+        }
+        else if (User.EsAdministrador())
+        {
+            <div class="menu-seccion">Principal</div>
+            <a class="nav-link @Activo("Admin", "Index")" asp-controller="Admin" asp-action="Index"><i class="bi bi-speedometer2"></i>Panel general</a>
+
+            <div class="menu-seccion">Administración</div>
+            <a class="nav-link @Activo("Admin", "Usuarios")" asp-controller="Admin" asp-action="Usuarios"><i class="bi bi-people"></i>Usuarios</a>
+            <a class="nav-link @Activo("Admin", "Plazas")" asp-controller="Admin" asp-action="Plazas"><i class="bi bi-briefcase"></i>Plazas</a>
+            <a class="nav-link @Activo("Admin", "Postulaciones")" asp-controller="Admin" asp-action="Postulaciones"><i class="bi bi-clipboard-check"></i>Postulaciones</a>
+
+            <div class="menu-seccion">Consulta</div>
+            <a class="nav-link @Activo("Plazas")" asp-controller="Plazas" asp-action="Index"><i class="bi bi-globe2"></i>Plazas publicadas</a>
+        }
+    </nav>
+
+    <div class="lateral-usuario d-flex align-items-center gap-2">
+        <span class="avatar">@User.Iniciales()</span>
+        <div class="flex-grow-1" style="min-width:0">
+            <div class="text-white fw-semibold small text-truncate">@User.NombreUsuario()</div>
+            <div class="small text-truncate" style="color:#7f9aa5">@User.Rol()</div>
+        </div>
+        <form asp-controller="Cuenta" asp-action="Logout" method="post">
+            <button type="submit" class="btn btn-sm text-white-50" title="Cerrar sesión" aria-label="Cerrar sesión"><i class="bi bi-box-arrow-right m-0 fs-5"></i></button>
+        </form>
+    </div>
+</div>

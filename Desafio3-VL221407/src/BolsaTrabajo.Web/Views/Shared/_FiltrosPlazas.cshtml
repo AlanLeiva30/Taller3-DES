@@ -1,0 +1,12 @@
+@model ListadoPlazasViewModel
+<div class="filtros">
+    <a class="filtro @(Model.Filtro is null ? "active" : "")" href="@Url.Action(ViewContext.RouteData.Values["action"]?.ToString())">
+        Todas <span class="contador">@Model.Todas.Count</span>
+    </a>
+    @foreach (var opcion in FiltroPlaza.Opciones)
+    {
+        <a class="filtro @(Model.Filtro == opcion.Clave ? "active" : "")" href="@Url.Action(null, new { estado = opcion.Clave })">
+            @opcion.Texto <span class="contador">@Model.Contar(opcion.Clave)</span>
+        </a>
+    }
+</div>

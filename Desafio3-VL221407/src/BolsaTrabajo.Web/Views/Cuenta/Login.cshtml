@@ -1,0 +1,67 @@
+﻿@model LoginViewModel
+@{
+    ViewData["Title"] = "Iniciar sesión";
+}
+<div class="container">
+    <div class="auth-contenedor">
+        <div class="card auth-tarjeta">
+            <div class="row g-0">
+                <div class="col-lg-5 d-none d-lg-block">
+                    <div class="auth-lado">
+                        <span class="marca-icono mb-4"><i class="bi bi-briefcase-fill"></i></span>
+                        <h2 class="fw-bold mb-3">Bienvenido de nuevo</h2>
+                        <p class="mb-4" style="color:#b5d0d1">Ingrese para continuar con sus procesos de selección.</p>
+                        <ul class="list-unstyled mb-0">
+                            <li><i class="bi bi-check2-circle"></i>Consulte el estado de sus postulaciones</li>
+                            <li><i class="bi bi-check2-circle"></i>Postúlese a nuevas plazas</li>
+                            <li><i class="bi bi-check2-circle"></i>Mantenga su perfil actualizado</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="auth-formulario">
+                        <h1 class="h3 fw-bold mb-1">Iniciar sesión</h1>
+                        <p class="text-secondary mb-4">Use el correo y la contraseña con los que se registró.</p>
+
+                        <form asp-action="Login" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post" novalidate>
+                            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                            <div class="mb-3">
+                                <label asp-for="Email" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="bi bi-envelope text-secondary"></i></span>
+                                    <input asp-for="Email" class="form-control" placeholder="nombre@correo.com" autocomplete="username" autofocus />
+                                </div>
+                                <span asp-validation-for="Email"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Password" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="bi bi-lock text-secondary"></i></span>
+                                    <input asp-for="Password" class="form-control" placeholder="Su contraseña" autocomplete="current-password" />
+                                </div>
+                                <span asp-validation-for="Password"></span>
+                            </div>
+
+                            <div class="form-check mb-4">
+                                <input asp-for="Recordarme" class="form-check-input" />
+                                <label asp-for="Recordarme" class="form-check-label"></label>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100 py-2"><i class="bi bi-box-arrow-in-right"></i>Ingresar</button>
+                        </form>
+
+                        <p class="text-center text-secondary mt-4 mb-0">
+                            ¿Aún no tiene cuenta? <a asp-action="Registro" class="fw-semibold">Regístrese como candidato</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

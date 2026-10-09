@@ -1,0 +1,32 @@
+@model EditarPlazaViewModel
+@{
+    ViewData["Title"] = "Editar plaza";
+    ViewData["Subtitulo"] = Model.Datos.Titulo;
+}
+
+<div class="row justify-content-center">
+    <div class="col-xl-9">
+        <nav aria-label="Ruta de navegación" class="mb-3">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a asp-action="Plazas">Mis plazas</a></li>
+                <li class="breadcrumb-item"><a asp-action="Plaza" asp-route-id="@Model.IdPlaza">@Model.Datos.Titulo</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Editar</li>
+            </ol>
+        </nav>
+
+        <form asp-action="EditarPlaza" asp-route-id="@Model.IdPlaza" method="post" novalidate>
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+            <partial name="_CamposPlaza" for="Datos" />
+
+            <div class="d-flex flex-wrap justify-content-end gap-2">
+                <a class="btn btn-light" asp-action="Plaza" asp-route-id="@Model.IdPlaza">Cancelar</a>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i>Guardar cambios</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

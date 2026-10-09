@@ -1,0 +1,13 @@
+@* Encabezado de página para visitantes. Con sesión iniciada, el título ya aparece en la barra superior del panel. *@
+@if (User.Identity?.IsAuthenticated != true)
+{
+    <section class="encabezado-publico">
+        <div class="container">
+            <h1>@ViewData["Title"]</h1>
+            @if (ViewData["Subtitulo"] is string subtitulo)
+            {
+                <p>@subtitulo</p>
+            }
+        </div>
+    </section>
+}

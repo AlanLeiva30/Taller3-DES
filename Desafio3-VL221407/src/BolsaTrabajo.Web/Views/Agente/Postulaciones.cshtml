@@ -1,0 +1,32 @@
+@model ListadoPostulacionesViewModel
+@{
+    ViewData["Title"] = "Postulaciones recibidas";
+    ViewData["Subtitulo"] = "Evalúe a los candidatos que se postularon a sus plazas.";
+    ViewData["Evaluar"] = true;
+    ViewData["MostrarPlaza"] = Model.IdPlazaFiltro is null;
+}
+
+<partial name="_SelectorPlaza" model="Model" />
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <partial name="_FiltrosPostulaciones" model="Model" />
+    @if (Model.IdPlazaFiltro is not null)
+    {
+        <a class="btn btn-outline-primary" asp-action="Plaza" asp-route-id="@Model.IdPlazaFiltro"><i class="bi bi-gear"></i>Gestionar esta plaza</a>
+    }
+</div>
+
+<div class="card">
+    @if (Model.Todas.Count == 0)
+    {
+        <partial name="_EstadoVacio" model='new EstadoVacioViewModel("bi-inbox", "Aún no hay postulaciones", "Cuando los candidatos se postulen a sus plazas publicadas, aparecerán aquí.")' />
+    }
+    else if (Model.Postulaciones.Count == 0)
+    {
+        <partial name="_EstadoVacio" model='new EstadoVacioViewModel("bi-funnel", "No hay postulaciones con este estado", "Seleccione otro filtro para ver el resto.")' />
+    }
+    else
+    {
+        <partial name="_TablaPostulaciones" model="Model.Postulaciones" view-data="ViewData" />
+    }
+</div>

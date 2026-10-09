@@ -1,0 +1,86 @@
+@model List<PlazaDto>
+@{
+    // "Agente" o "Admin": a qué área lleva el botón de postulaciones. El Administrador ve además el agente responsable.
+    var area = ViewData["Area"] as string ?? "Agente";
+    var mostrarAgente = area == "Admin";
+    // Versión compacta para los paneles: sin fecha de publicación y con botones solo de ícono.
+    var compacta = ViewData["Compacta"] as bool? ?? false;
+}
+<div class="table-responsive">
+    <table class="table table-hover tabla">
+        <thead>
+            <tr>
+                <th>Plaza</th>
+                @if (mostrarAgente)
+                {
+                    <th>Agente</th>
+                }
+                @if (!compacta)
+                {
+                    <th>Publicación</th>
+                }
+                <th>Cierre</th>
+                <th>Estado</th>
+                <th class="text-center">Postulaciones</th>
+                <th class="text-end">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in Model)
+            {
+                <tr>
+                    <td style="min-width: 14rem">
+                        <a class="titulo-celda" asp-controller="Plazas" asp-action="Detalle" asp-route-id="@p.IdPlaza">@p.Titulo</a>
+                        <div class="subtexto">@p.Institucion</div>
+                    </td>
+                    @if (mostrarAgente)
+                    {
+                        <td class="text-nowrap">@p.NombreAgente</td>
+                    }
+                    @if (!compacta)
+                    {
+                        <td class="text-nowrap">@Presentacion.FechaCorta(p.FechaPublicacion)</td>
+                    }
+                    <td class="text-nowrap">
+                        @Presentacion.FechaCorta(p.FechaCierre)
+                        @if (p.Publicada && p.Estado == EstadoPlaza.Abierta)
+                        {
+                            <div class="subtexto @Presentacion.ClaseTiempoRestante(p.FechaCierre)">@Presentacion.TiempoRestante(p.FechaCierre)</div>
+                        }
+                    </td>
+                    <td><span class="estado @Presentacion.ClaseEstadoPlaza(p)">@Presentacion.TextoEstadoPlaza(p)</span></td>
+                    <td class="text-center fw-semibold">@p.TotalPostulaciones</td>
+                    <td class="text-end text-nowrap">
+                        <a class="btn btn-sm btn-light" asp-controller="Plazas" asp-action="Detalle" asp-route-id="@p.IdPlaza" title="Ver detalle"><i class="bi bi-eye m-0"></i></a>
+                        @if (area == "Agente")
+                        {
+                            <a class="btn btn-sm btn-primary" asp-controller="Agente" asp-action="Plaza" asp-route-id="@p.IdPlaza" title="Editar, publicar, cambiar estado y evaluar">
+                                <i class="bi bi-gear @(compacta ? "m-0" : "")"></i>@(compacta ? "" : "Gestionar")
+                            </a>
+                        }
+                        else
+                        {
+                            <a class="btn btn-sm btn-outline-primary" asp-controller="Admin" asp-action="Postulaciones" asp-route-plaza="@p.IdPlaza"><i class="bi bi-people"></i>Postulaciones</a>
+                            <div class="dropdown d-inline-block">
+                                <button class="btn btn-sm btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Estado</button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                                    <li><h6 class="dropdown-header">Cambiar estado del proceso</h6></li>
+                                    @foreach (var e in Enum.GetValues<EstadoPlaza>().Where(e => e != p.Estado))
+                                    {
+                                        <li>
+                                            <form asp-controller="Admin" asp-action="CambiarEstadoPlaza" asp-route-id="@p.IdPlaza" asp-route-filtro="@Context.Request.Query["estado"]" method="post"
+                                                  data-confirmar="¿Cambiar el estado de «@p.Titulo» a «@Presentacion.Texto(e)»?" data-confirmar-boton="Sí, cambiar">
+                                                <input type="hidden" name="estado" value="@e" />
+                                                <button type="submit" class="dropdown-item">@Presentacion.Texto(e)</button>
+                                            </form>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

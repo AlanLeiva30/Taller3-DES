@@ -1,0 +1,139 @@
+@model AdminPanelViewModel
+@{
+    ViewData["Title"] = "Panel general";
+    ViewData["Subtitulo"] = "Resumen de usuarios, plazas y procesos de selección.";
+    var e = Model.Estado;
+    var totalProcesos = Math.Max(Model.Procesos.Count, 1);
+    var totalUsuariosRoles = Math.Max(Model.Roles.Sum(r => r.TotalUsuarios), 1);
+}
+
+<div class="row row-cols-2 row-cols-xl-4 g-3 mb-4">
+    <div class="col"><partial name="_Indicador" model='new IndicadorViewModel("bi-people", e.TotalUsuarios.ToString(), "Usuarios registrados", "azul")' /></div>
+    <div class="col"><partial name="_Indicador" model='new IndicadorViewModel("bi-briefcase", e.TotalPlazas.ToString(), "Plazas", "celeste", $"{Model.ProcesosActivos} activas")' /></div>
+    <div class="col"><partial name="_Indicador" model='new IndicadorViewModel("bi-clipboard-check", e.TotalPostulaciones.ToString(), "Postulaciones", "verde", $"{Model.PendientesDeRevisar} en revisión")' /></div>
+    <div class="col"><partial name="_Indicador" model='new IndicadorViewModel("bi-file-earmark-person", e.TotalHojasDeVida.ToString(), "Hojas de vida", "morado")' /></div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2>Estado de las plazas</h2>
+                <a asp-action="Plazas" class="small fw-semibold">Ver plazas</a>
+            </div>
+            <div class="card-body">
+                @foreach (var (texto, valor, color, filtro) in new[]
+                {
+                    ("Activas", Model.ProcesosActivos, "bg-success", FiltroPlaza.Activas),
+                    ("En evaluación", Model.ProcesosEnEvaluacion, "bg-warning", FiltroPlaza.Evaluacion),
+                    ("Cerradas", Model.ProcesosCerrados, "bg-secondary", FiltroPlaza.Cerradas),
+                    ("Borradores", Model.Borradores, "bg-info", FiltroPlaza.Borradores)
+                })
+                {
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between small mb-1">
+                            <a asp-action="Plazas" asp-route-estado="@filtro" class="fw-semibold text-body">@texto</a>
+                            <span class="text-secondary">@valor</span>
+                        </div>
+                        <div class="progress barra-progreso" role="progressbar" aria-label="@texto" aria-valuenow="@valor" aria-valuemin="0" aria-valuemax="@totalProcesos">
+                            <div class="progress-bar @color" style="width: @(valor * 100 / totalProcesos)%"></div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2>Usuarios por rol</h2>
+                <a asp-action="Usuarios" class="small fw-semibold">Ver usuarios</a>
+            </div>
+            <div class="card-body">
+                @foreach (var rol in Model.Roles)
+                {
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <span class="rol @Presentacion.ClaseRol(rol.Nombre)" style="min-width: 11rem"><i class="bi @Presentacion.IconoRol(rol.Nombre)"></i>@rol.Nombre</span>
+                        <div class="progress barra-progreso flex-grow-1" role="progressbar" aria-label="@rol.Nombre" aria-valuenow="@rol.TotalUsuarios" aria-valuemin="0" aria-valuemax="@totalUsuariosRoles">
+                            <div class="progress-bar" style="width: @(rol.TotalUsuarios * 100 / totalUsuariosRoles)%"></div>
+                        </div>
+                        <a asp-action="Usuarios" asp-route-rol="@rol.Nombre" class="fw-bold text-body" style="min-width: 2rem; text-align:right">@rol.TotalUsuarios</a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h2>Monitoreo de procesos de selección</h2>
+        <a asp-action="Postulaciones" class="small fw-semibold">Ver postulaciones</a>
+    </div>
+    @if (Model.Procesos.Count == 0)
+    {
+        <partial name="_EstadoVacio" model='new EstadoVacioViewModel("bi-briefcase", "No hay procesos registrados", "Cuando los agentes creen plazas, su avance aparecerá aquí.")' />
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover tabla">
+                <thead>
+                    <tr>
+                        <th>Plaza</th>
+                        <th>Cierre</th>
+                        <th>Estado</th>
+                        <th class="text-center" title="Total de postulaciones">Total</th>
+                        <th>Resultados</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in Model.Procesos)
+                    {
+                        <tr>
+                            <td style="min-width: 11rem">
+                                <a class="titulo-celda" asp-controller="Plazas" asp-action="Detalle" asp-route-id="@p.IdPlaza">@p.Titulo</a>
+                                <div class="subtexto">@p.Institucion · @p.NombreAgente</div>
+                            </td>
+                            <td class="text-nowrap">@Presentacion.FechaCorta(p.FechaCierre)</td>
+                            <td><span class="estado @Presentacion.ClaseEstadoPlaza(p.Estado, p.Publicada)">@Presentacion.TextoEstadoPlaza(p.Estado, p.Publicada)</span></td>
+                            <td class="text-center fw-bold">
+                                <a asp-action="Postulaciones" asp-route-plaza="@p.IdPlaza" class="text-body">@p.TotalPostulaciones</a>
+                            </td>
+                            <td>
+                                @if (p.TotalPostulaciones == 0)
+                                {
+                                    <span class="subtexto">Sin postulaciones</span>
+                                }
+                                else
+                                {
+                                    <div class="d-flex flex-wrap gap-1">
+                                        @if (p.EnRevision > 0) { <span class="estado estado-revision" title="En revisión">@p.EnRevision en revisión</span> }
+                                        @if (p.Aprobadas > 0) { <span class="estado estado-aprobada" title="Aprobadas">@p.Aprobadas aprobada(s)</span> }
+                                        @if (p.Rechazadas > 0) { <span class="estado estado-rechazada" title="Rechazadas">@p.Rechazadas rechazada(s)</span> }
+                                    </div>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h2>Postulaciones recientes</h2>
+        <a asp-action="Postulaciones" class="small fw-semibold">Ver todas</a>
+    </div>
+    @if (Model.PostulacionesRecientes.Count == 0)
+    {
+        <partial name="_EstadoVacio" model='new EstadoVacioViewModel("bi-inbox", "Aún no hay postulaciones", "Las postulaciones de los candidatos aparecerán aquí.")' />
+    }
+    else
+    {
+        <partial name="_TablaPostulaciones" model="Model.PostulacionesRecientes" />
+    }
+</div>

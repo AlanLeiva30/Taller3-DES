@@ -1,0 +1,19 @@
+@model ListadoPostulacionesViewModel
+@{
+    var opciones = new (EstadoPostulacion? Estado, string Texto)[]
+    {
+        (null, "Todas"),
+        (EstadoPostulacion.EnRevision, "En revisión"),
+        (EstadoPostulacion.Aprobada, "Aprobadas"),
+        (EstadoPostulacion.Rechazada, "Rechazadas")
+    };
+}
+<div class="filtros">
+    @foreach (var opcion in opciones)
+    {
+        <a class="filtro @(Model.EstadoFiltro == opcion.Estado ? "active" : "")"
+           href="@Url.Action(null, new { estado = opcion.Estado, plaza = Model.IdPlazaFiltro })">
+            @opcion.Texto <span class="contador">@Model.Contar(opcion.Estado)</span>
+        </a>
+    }
+</div>

@@ -1,0 +1,4 @@
+@{
+    // Visitantes: diseño público con barra superior. Usuarios con sesión: panel con menú lateral.
+    Layout = User.Identity?.IsAuthenticated == true ? "_LayoutPanel" : "_Layout";
+}

@@ -1,0 +1,11 @@
+@{
+    ViewData["Title"] = "Algo salió mal";
+}
+<div class="@(User.Identity?.IsAuthenticated == true ? "" : "container")">
+    <div class="pagina-mensaje">
+        <div class="vacio-icono color-rojo"><i class="bi bi-exclamation-triangle"></i></div>
+        <h2 class="fw-bold">No pudimos completar la operación</h2>
+        <p class="text-secondary">@(ViewData["Mensaje"] ?? "Ocurrió un problema inesperado. Intente de nuevo más tarde.")</p>
+        <a class="btn btn-primary mt-3" asp-controller="Home" asp-action="Index"><i class="bi bi-house"></i>Ir al inicio</a>
+    </div>
+</div>

@@ -1,0 +1,90 @@
+@model AgentePanelViewModel
+@{
+    ViewData["Title"] = "Mi panel";
+    ViewData["Subtitulo"] = "Resumen de sus plazas y de las postulaciones recibidas.";
+    ViewData["Area"] = "Agente";
+    ViewData["Compacta"] = true;
+    var nombre = User.NombreUsuario().Split(' ')[0];
+    var proximas = Model.Plazas
+        .Where(p => p.Publicada && p.Estado == EstadoPlaza.Abierta)
+        .OrderBy(p => p.FechaCierre).Take(5).ToList();
+}
+
+<div class="bienvenida mb-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
+    <div>
+        <h2>Hola, @nombre</h2>
+        <p>
+            @if (Model.PendientesDeRevisar > 0)
+            {
+                <span>Tiene <strong>@Model.PendientesDeRevisar</strong> @(Model.PendientesDeRevisar == 1 ? "postulación pendiente" : "postulaciones pendientes") de revisar.</span>
+            }
+            else
+            {
+                <span>No tiene postulaciones pendientes de revisar.</span>
+            }
+        </p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-light" asp-action="CrearPlaza"><i class="bi bi-plus-circle"></i>Crear plaza</a>
+        <a class="btn btn-outline-light" asp-action="Postulaciones"><i class="bi bi-people"></i>Postulaciones</a>
+    </div>
+</div>
+
+<div class="row row-cols-2 row-cols-xl-4 g-3 mb-3">
+    <div class="col"><partial name="_Indicador" model='new IndicadorViewModel("bi-broadcast", Model.Activas.ToString(), "Plazas activas", "verde", "Publicadas y abiertas")' /></div>
+    <div class="col"><partial name="_Indicador" model='new IndicadorViewModel("bi-hourglass-split", Model.EnEvaluacion.ToString(), "En evaluación", "ambar")' /></div>
+    <div class="col"><partial name="_Indicador" model='new IndicadorViewModel("bi-lock", Model.Cerradas.ToString(), "Cerradas", "gris")' /></div>
+    <div class="col"><partial name="_Indicador" model='new IndicadorViewModel("bi-pencil-square", Model.Borradores.ToString(), "Borradores", "morado", "Sin publicar")' /></div>
+</div>
+<div class="row row-cols-1 row-cols-md-2 g-3 mb-4">
+    <div class="col"><partial name="_Indicador" model='new IndicadorViewModel("bi-inbox", Model.Recibidas.Count.ToString(), "Postulaciones recibidas", "azul", "En todas sus plazas")' /></div>
+    <div class="col"><partial name="_Indicador" model='new IndicadorViewModel("bi-clipboard-check", Model.PendientesDeRevisar.ToString(), "Pendientes de revisar", "celeste", "Postulaciones en revisión")' /></div>
+</div>
+
+<div class="row g-4">
+    <div class="col-xl-7">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2>Plazas activas próximas a cerrar</h2>
+                <a asp-action="Plazas" class="small fw-semibold">Ver todas mis plazas</a>
+            </div>
+            @if (proximas.Count == 0)
+            {
+                <partial name="_EstadoVacio" model='new EstadoVacioViewModel("bi-briefcase", "No tiene plazas activas", "Cree una plaza nueva para empezar a recibir postulaciones.", "Crear plaza", Url.Action("CrearPlaza"))' />
+            }
+            else
+            {
+                <partial name="_TablaPlazas" model="proximas" view-data="ViewData" />
+            }
+        </div>
+    </div>
+
+    <div class="col-xl-5">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2>Últimas postulaciones recibidas</h2>
+                <a asp-action="Postulaciones" class="small fw-semibold">Ver todas</a>
+            </div>
+            @if (Model.Recibidas.Count == 0)
+            {
+                <partial name="_EstadoVacio" model='new EstadoVacioViewModel("bi-inbox", "Aún no hay postulaciones", "Cuando los candidatos se postulen a sus plazas, aparecerán aquí.")' />
+            }
+            else
+            {
+                <div>
+                    @foreach (var p in Model.Recibidas.Take(6))
+                    {
+                        <div class="item-lista">
+                            <span class="avatar">@(p.NombreCandidato.Length > 0 ? p.NombreCandidato[..1].ToUpperInvariant() : "?")</span>
+                            <div class="flex-grow-1" style="min-width:0">
+                                <div class="fw-semibold text-truncate">@p.NombreCandidato</div>
+                                <div class="small text-secondary text-truncate">@p.TituloPlaza · @Presentacion.FechaCorta(p.FechaPostulacion)</div>
+                            </div>
+                            <span class="estado @Presentacion.ClaseEstadoPostulacion(p.Estado)">@Presentacion.Texto(p.Estado)</span>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>

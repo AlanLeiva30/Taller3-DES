@@ -1,0 +1,19 @@
+@{
+    var alertas = new[]
+    {
+        (Clave: "Exito", Clase: "alert-success", Icono: "bi-check-circle-fill"),
+        (Clave: "Error", Clase: "alert-danger", Icono: "bi-exclamation-octagon-fill"),
+        (Clave: "Info", Clase: "alert-info", Icono: "bi-info-circle-fill")
+    };
+}
+@foreach (var alerta in alertas)
+{
+    if (TempData[alerta.Clave] is string mensaje)
+    {
+        <div class="alert @alerta.Clase alert-dismissible fade show mb-4" role="alert">
+            <i class="bi @alerta.Icono"></i>
+            <div class="flex-grow-1">@mensaje</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+    }
+}

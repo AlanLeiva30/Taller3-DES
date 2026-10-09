@@ -1,0 +1,125 @@
+@model PlazaDetalleViewModel
+@{
+    var plaza = Model.Plaza;
+    ViewData["Title"] = plaza.Titulo;
+    ViewData["Subtitulo"] = plaza.Institucion;
+    var enPanel = User.Identity?.IsAuthenticated == true;
+    var urlRetorno = Url.Action("Detalle", new { id = plaza.IdPlaza });
+}
+
+<div class="@(enPanel ? "" : "container py-4")">
+    <nav aria-label="Ruta de navegación" class="mb-3">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a asp-action="Index">Plazas disponibles</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@plaza.Titulo</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body p-4">
+                    <div class="d-flex flex-wrap justify-content-between gap-2 mb-2">
+                        <span class="text-secondary fw-semibold"><i class="bi bi-building me-1"></i>@plaza.Institucion</span>
+                        <span class="estado @Presentacion.ClaseEstadoPlaza(plaza)">@Presentacion.TextoEstadoPlaza(plaza)</span>
+                    </div>
+                    <h2 class="fw-bold mb-4">@plaza.Titulo</h2>
+
+                    <h3 class="h6 text-uppercase text-secondary fw-bold mb-2" style="letter-spacing:.05em">Descripción del puesto</h3>
+                    <div class="texto-largo">@plaza.Descripcion</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header"><h3>Fechas del proceso</h3></div>
+                <div class="card-body">
+                    <dl class="lista-datos mb-0">
+                        <dt>Publicación</dt>
+                        <dd>@Presentacion.Fecha(plaza.FechaPublicacion)</dd>
+                        <dt>Cierre de postulaciones</dt>
+                        <dd class="mb-1">@Presentacion.Fecha(plaza.FechaCierre)</dd>
+                        <dd class="fw-semibold @Presentacion.ClaseTiempoRestante(plaza.FechaCierre) mb-0">
+                            <i class="bi bi-clock me-1"></i>@Presentacion.TiempoRestante(plaza.FechaCierre)
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    @if (!enPanel)
+                    {
+                        <h3 class="h6 fw-bold">¿Le interesa esta plaza?</h3>
+                        <p class="text-secondary small">Inicie sesión con su cuenta de candidato para postularse.</p>
+                        <a class="btn btn-primary w-100 mb-2" asp-controller="Cuenta" asp-action="Login" asp-route-returnUrl="@urlRetorno"><i class="bi bi-box-arrow-in-right"></i>Iniciar sesión para postularme</a>
+                        <a class="btn btn-outline-primary w-100" asp-controller="Cuenta" asp-action="Registro"><i class="bi bi-person-plus"></i>Crear una cuenta</a>
+                    }
+                    else if (User.EsCandidato() && Model.MiPostulacion is not null)
+                    {
+                        var p = Model.MiPostulacion;
+                        <div class="text-center">
+                            <div class="vacio-icono color-verde mb-3"><i class="bi bi-send-check"></i></div>
+                            <h3 class="h6 fw-bold">Ya se postuló a esta plaza</h3>
+                            <p class="text-secondary small mb-2">Enviada el @Presentacion.Fecha(p.FechaPostulacion)</p>
+                            <span class="estado @Presentacion.ClaseEstadoPostulacion(p.Estado)">@Presentacion.Texto(p.Estado)</span>
+                            <a class="btn btn-outline-primary w-100 mt-3" asp-controller="Candidato" asp-action="MisPostulaciones"><i class="bi bi-list-check"></i>Ver mis postulaciones</a>
+                        </div>
+                    }
+                    else if (User.EsCandidato() && Model.RecibePostulaciones)
+                    {
+                        <h3 class="h6 fw-bold">Postularme a esta plaza</h3>
+                        <p class="text-secondary small">Su información de perfil se enviará al agente de selección responsable.</p>
+                        <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#confirmarPostulacion"><i class="bi bi-send"></i>Postularme</button>
+                    }
+                    else if (User.EsCandidato())
+                    {
+                        <div class="alert alert-info mb-0"><i class="bi bi-info-circle-fill"></i><div>Esta plaza ya no está recibiendo postulaciones.</div></div>
+                    }
+                    else if (Model.EsDelAgenteActual)
+                    {
+                        <h3 class="h6 fw-bold">Esta plaza está a su cargo</h3>
+                        <p class="text-secondary small mb-3">Ha recibido <strong>@plaza.TotalPostulaciones</strong> @(plaza.TotalPostulaciones == 1 ? "postulación" : "postulaciones").</p>
+                        <a class="btn btn-primary w-100" asp-controller="Agente" asp-action="Plaza" asp-route-id="@plaza.IdPlaza"><i class="bi bi-gear"></i>Gestionar plaza y evaluar</a>
+                    }
+                    else if (User.EsAdministrador())
+                    {
+                        <h3 class="h6 fw-bold">Supervisión del proceso</h3>
+                        <p class="text-secondary small mb-1">Agente responsable: <strong>@plaza.NombreAgente</strong></p>
+                        <p class="text-secondary small mb-3">Postulaciones recibidas: <strong>@plaza.TotalPostulaciones</strong></p>
+                        <a class="btn btn-primary w-100" asp-controller="Admin" asp-action="Postulaciones" asp-route-plaza="@plaza.IdPlaza"><i class="bi bi-clipboard-check"></i>Ver postulaciones</a>
+                    }
+                    else
+                    {
+                        <p class="text-secondary small mb-0">Solo los candidatos pueden postularse a las plazas.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (User.EsCandidato() && Model.MiPostulacion is null && Model.RecibePostulaciones)
+{
+    <div class="modal fade" id="confirmarPostulacion" tabindex="-1" aria-labelledby="tituloConfirmar" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0">
+                <form asp-action="Postular" asp-route-id="@plaza.IdPlaza" method="post">
+                    <div class="modal-header border-0 pb-0">
+                        <h2 class="modal-title h5 fw-bold" id="tituloConfirmar">Confirmar postulación</h2>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="mb-1">¿Desea postularse a la plaza <strong>@plaza.Titulo</strong> en <strong>@plaza.Institucion</strong>?</p>
+                        <p class="text-secondary small mb-0">Solo puede postularse una vez a cada plaza.</p>
+                    </div>
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-send"></i>Sí, postularme</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
