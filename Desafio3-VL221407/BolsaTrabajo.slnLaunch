@@ -1,0 +1,17 @@
+[
+  {
+    "Name": "API + Portal",
+    "Projects": [
+      {
+        "Path": "src\\BolsaTrabajo.API\\BolsaTrabajo.API.csproj",
+        "Action": "Start",
+        "DebugTarget": "https"
+      },
+      {
+        "Path": "src\\BolsaTrabajo.Web\\BolsaTrabajo.Web.csproj",
+        "Action": "Start",
+        "DebugTarget": "https"
+      }
+    ]
+  }
+]

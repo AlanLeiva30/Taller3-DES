@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/BolsaTrabajo.API/BolsaTrabajo.API.csproj" />
+    <Project Path="src/BolsaTrabajo.BLL/BolsaTrabajo.BLL.csproj" />
+    <Project Path="src/BolsaTrabajo.DAL/BolsaTrabajo.DAL.csproj" />
+    <Project Path="src/BolsaTrabajo.DTOs/BolsaTrabajo.DTOs.csproj" />
+    <Project Path="src/BolsaTrabajo.Entities/BolsaTrabajo.Entities.csproj" />
+    <Project Path="src/BolsaTrabajo.Web/BolsaTrabajo.Web.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/BolsaTrabajo.Tests/BolsaTrabajo.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Archivos de la solución/">
+    <File Path="README.md" />
+    <File Path=".gitignore" />
+    <File Path="dotnet-tools.json" />
+  </Folder>
+</Solution>
